@@ -9,13 +9,9 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 public class Nem12LineMapper implements LineMapper<Nem12RecordDto>
 {
     private final DelimitedLineTokenizer tokenizer;
-    // current read 200 header (nmi identified)
-    // to be set to null when completing the current 200 range (i.e. 900 reached)
-    private String nmi;
 
     public Nem12LineMapper(DelimitedLineTokenizer tokenizer) {
         this.tokenizer = tokenizer;
-        this.nmi = null;
     }
 
     private String[] tokenizeToRecord(String line) {
@@ -26,12 +22,9 @@ public class Nem12LineMapper implements LineMapper<Nem12RecordDto>
     @Override
     public Nem12RecordDto mapLine(String line, int lineNumber) throws Exception
     {
-
-        if(nmi == null) {
-            // read 200
-        } else {
-
-        }
+        // tokenize and interpret record type of line only
+        // processor will determine processing logic
+        // validate each record for record type value validate only
         return null;
     }
 }

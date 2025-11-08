@@ -11,6 +11,9 @@ public class Nem12ItemProcessor implements ItemProcessor<Nem12RecordDto, MeterRe
     @Override
     public MeterReadingEntity process(Nem12RecordDto item) throws Exception
     {
+        // todo: if record is not 200/300, then return null to skip the record
+        //       if record is 900, indicate in job context that end of record is present
+        //       this is for finalisation step (if file ended without 900, must throw error)
         return null;
     }
 }

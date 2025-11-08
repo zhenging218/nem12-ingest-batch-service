@@ -16,6 +16,8 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,9 +47,19 @@ public class IngestStepConfiguration
     }
 
     @StepScope
+    @Bean("nem12LineTokenizer")
+    public LineTokenizer nem12LineTokenizer(
+            @Value("") String delimiter
+    ) {
+        return new DelimitedLineTokenizer(delimiter);
+    }
+
+    @StepScope
     @Bean("nem12LineMapper")
-    public LineMapper<Nem12RecordDto> nem12LineMapper() {
-        return new Nem12LineMapper();
+    public LineMapper<Nem12RecordDto> nem12LineMapper(
+            @Qualifier("nem12LineTokenizer") DelimitedLineTokenizer tokenizer
+    ) {
+        return new Nem12LineMapper(tokenizer);
     }
 
     @StepScope

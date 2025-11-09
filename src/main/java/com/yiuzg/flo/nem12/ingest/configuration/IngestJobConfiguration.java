@@ -28,6 +28,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class IngestJobConfiguration
 {
+    // todo: after clarification, remove staging and commit 300 records directly if consumption
+    //       is to be accumulated and not commited per interval value
+
     @Bean("ingestJob")
     public Job ingestJob(
             @Value("${flo.nem12.ingest.job.name}") String jobName,
@@ -58,16 +61,28 @@ public class IngestJobConfiguration
     }
 
     @JobScope
-    @Bean("ingestFlow")
-    public Flow ingestFlow(@Value("${flo.nem12.ingest.flow.name}") String flowName,
+    @Bean("ingestAndStageFlow")
+    public Flow ingestAndStageFlow(@Value("${flo.nem12.ingest.flow.name}") String flowName,
             @Qualifier("ingestInitStep") Step ingestInitStep,
-            @Qualifier("ingestStep") Step ingestStep,
+            @Qualifier("ingestAndStageStep") Step ingestStep,
             @Qualifier("commitMeterReadingStep") Step commitMeterReadingStep
     ) {
         return new FlowBuilder<Flow>(flowName)
                 .start(ingestInitStep)
                 .next(ingestStep)
                 .next(commitMeterReadingStep)
+                .end();
+    }
+
+    @JobScope
+    @Bean("ingestFlow")
+    public Flow ingestFlow(@Value("${flo.nem12.ingest.flow.name}") String flowName,
+                           @Qualifier("ingestInitStep") Step ingestInitStep,
+                           @Qualifier("ingestStep") Step ingestStep
+    ) {
+        return new FlowBuilder<Flow>(flowName)
+                .start(ingestInitStep)
+                .next(ingestStep)
                 .end();
     }
 }

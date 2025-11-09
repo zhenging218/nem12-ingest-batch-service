@@ -5,7 +5,9 @@ import com.yiuzg.flo.nem12.ingest.entity.impl.Nem12StagingEntity;
 import com.yiuzg.flo.nem12.ingest.mapper.Nem12FieldSetMapper;
 import com.yiuzg.flo.nem12.ingest.processor.Nem12RecordItemProcessor;
 import com.yiuzg.flo.nem12.ingest.reader.IngestLocalFileItemReader;
+import com.yiuzg.flo.nem12.ingest.repository.MeterReadingRepository;
 import com.yiuzg.flo.nem12.ingest.service.FileStagingService;
+import com.yiuzg.flo.nem12.ingest.writer.Nem12RecordItemWriter;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -32,8 +34,8 @@ import tools.jackson.databind.ObjectMapper;
 public class IngestStepConfiguration
 {
     @JobScope
-    @Bean("ingestStep")
-    public Step ingestStep(@Value("${flo.nem12.ingest.step.name}") String stepName,
+    @Bean("ingestAndStageStep")
+    public Step ingestAndStageStep(@Value("${flo.nem12.ingest.step.name}") String stepName,
        JobRepository jobRepository,
        PlatformTransactionManager platformTransactionManager,
        @Qualifier("nem12ItemReader") ItemReader<Nem12RecordDto> itemReader,
@@ -43,6 +45,24 @@ public class IngestStepConfiguration
     ) {
         return new StepBuilder(stepName, jobRepository)
                 .<Nem12RecordDto, Nem12StagingEntity>chunk(chunkSize, platformTransactionManager)
+                .reader(itemReader)
+                .processor(itemProcessor)
+                .writer(itemWriter)
+                .build();
+    }
+
+    @JobScope
+    @Bean("ingestStep")
+    public Step ingestStep(@Value("${flo.nem12.ingest.step.name}") String stepName,
+                           JobRepository jobRepository,
+                           PlatformTransactionManager platformTransactionManager,
+                           @Qualifier("nem12ItemReader") ItemReader<Nem12RecordDto> itemReader,
+                           @Qualifier("nem12ItemProcessor") ItemProcessor<Nem12RecordDto, Nem12RecordDto> itemProcessor,
+                           @Qualifier("nem12ItemWriter") ItemWriter<Nem12RecordDto> itemWriter,
+                           @Value("${flo.nem12.ingest.chunk-size}") int chunkSize
+    ) {
+        return new StepBuilder(stepName, jobRepository)
+                .<Nem12RecordDto, Nem12RecordDto>chunk(chunkSize, platformTransactionManager)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
@@ -89,5 +109,11 @@ public class IngestStepConfiguration
             ObjectMapper objectMapper
     ) {
         return new Nem12RecordItemProcessor(objectMapper);
+    }
+
+    @StepScope
+    @Bean("nem12ItemWriter")
+    public ItemWriter<Nem12RecordDto> nem12ItemWriter(MeterReadingRepository meterReadingRepository) {
+        return new Nem12RecordItemWriter(meterReadingRepository);
     }
 }

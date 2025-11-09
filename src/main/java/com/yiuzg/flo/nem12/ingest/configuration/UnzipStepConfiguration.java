@@ -1,5 +1,6 @@
 package com.yiuzg.flo.nem12.ingest.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yiuzg.flo.nem12.ingest.service.FileArchiveService;
 import com.yiuzg.flo.nem12.ingest.service.FileStagingService;
 import com.yiuzg.flo.nem12.ingest.tasklet.UnzipTasklet;
@@ -29,8 +30,9 @@ public class UnzipStepConfiguration
     @StepScope
     @Bean("unzipTasklet")
     public Tasklet unzipTasklet(
+            ObjectMapper objectMapper,
             FileArchiveService fileArchiveService,
             FileStagingService fileStagingService) {
-        return new UnzipTasklet(fileArchiveService, fileStagingService);
+        return new UnzipTasklet(objectMapper, fileArchiveService, fileStagingService);
     }
 }

@@ -13,10 +13,10 @@ import lombok.*;
 @Table(name = "table_nem12_staging", indexes = {@Index(name = "index_nem12_staging_type_state", columnList = "type, state")})
 public class Nem12StagingEntity extends StagingEntity
 {
-    @Column(name = "key")
+    @Column(name = "stage_key")
     private String key;
 
     @Lob
-    @Column(name = "payload", nullable = false)
+    @Column(name = "stage_payload", nullable = false)
     private String payload;
 }

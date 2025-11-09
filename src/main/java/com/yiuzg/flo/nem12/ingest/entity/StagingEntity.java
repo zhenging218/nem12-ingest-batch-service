@@ -16,7 +16,7 @@ public abstract class StagingEntity
     @Id
     @Column(name = "id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "type", length = 20, nullable = false)
     private String type;

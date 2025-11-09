@@ -27,14 +27,21 @@ public class IngestLocalFileItemReader extends FlatFileItemReader<Nem12RecordDto
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        FileDto file = (FileDto) stepExecution.getJobExecution().getExecutionContext().get(BatchJobConstants.JOB_CONTEXT_FILE_PATH_KEY);
-        try
+        FileDto file = (FileDto) stepExecution.getJobExecution().getExecutionContext()
+                .get(BatchJobConstants.JOB_CONTEXT_FILE_PATH_KEY);
+
+        if(file != null)
         {
-            setResource(new InputStreamResource(fileStagingService.retrieve(file)));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
+            try
+            {
+                setResource(new InputStreamResource(fileStagingService.retrieve(file)));
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new IllegalArgumentException("Expected current file path to process to exist");
         }
     }
 

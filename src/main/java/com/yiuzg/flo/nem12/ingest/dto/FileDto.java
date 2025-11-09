@@ -1,18 +1,17 @@
 package com.yiuzg.flo.nem12.ingest.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class FileDto
+public class FileDto implements Serializable
 {
     private String filename;
     private String objectKey;

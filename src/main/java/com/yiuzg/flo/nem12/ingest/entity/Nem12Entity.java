@@ -16,5 +16,5 @@ public abstract class Nem12Entity
     @Id
     @Column(name = "id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 }

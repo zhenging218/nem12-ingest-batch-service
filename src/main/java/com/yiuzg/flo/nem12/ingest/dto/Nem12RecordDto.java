@@ -7,7 +7,9 @@ import com.yiuzg.flo.nem12.ingest.dto.impl.*;
 import lombok.*;
 
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "recordIndicator", visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "recordIndicator", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Nem12HeaderRecordDto.class, name = Nem12Constants.NEM12_HEADER_IND),
         @JsonSubTypes.Type(value = Nem12NMIDetailRecordDto.class, name = Nem12Constants.NEM12_NMI_DETAIL_IND),

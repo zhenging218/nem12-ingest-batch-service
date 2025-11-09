@@ -3,6 +3,8 @@ package com.yiuzg.flo.nem12.ingest.dto.impl;
 import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

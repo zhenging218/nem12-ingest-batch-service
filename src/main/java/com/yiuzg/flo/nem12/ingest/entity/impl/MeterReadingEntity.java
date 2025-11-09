@@ -1,27 +1,21 @@
-package com.yiuzg.flo.nem12.ingest.entity;
+package com.yiuzg.flo.nem12.ingest.entity.impl;
 
+import com.yiuzg.flo.nem12.ingest.entity.Nem12Entity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Entity
 @Table(name = "table meter_readings", uniqueConstraints = @UniqueConstraint(columnNames = {"nmi", "timestamp"}))
-public class MeterReadingEntity
+public class MeterReadingEntity extends Nem12Entity
 {
-    @Id
-    @Column(name = "id", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
     @Column(name = "nmi", length = 10, nullable = false)
     private String nmi;
 

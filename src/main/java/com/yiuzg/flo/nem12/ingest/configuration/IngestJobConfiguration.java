@@ -22,8 +22,12 @@ public class IngestJobConfiguration
             @Value("${flo.nem12.ingest.job.name}") String jobName,
             JobRepository jobRepository,
             PlatformTransactionManager platformTransactionManager,
-            @Qualifier("ingestStep") Step ingestStep) {
+            @Qualifier("ingestStep") Step ingestStep,
+            @Qualifier("commitMeterReadingStep") Step commitMeterReadingStep) {
 
-        return new JobBuilder(jobName, jobRepository).start(ingestStep).build();
+        return new JobBuilder(jobName, jobRepository)
+                .start(ingestStep)
+                .next(commitMeterReadingStep)
+                .build();
     }
 }

@@ -1,0 +1,85 @@
+package com.yiuzg.flo.nem12.ingest.mapper;
+
+import com.yiuzg.flo.nem12.ingest.constants.Nem12Constants;
+import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
+import com.yiuzg.flo.nem12.ingest.dto.impl.*;
+import com.yiuzg.flo.nem12.ingest.utilities.DateUtil;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.validation.BindException;
+
+import java.math.BigDecimal;
+import java.util.stream.IntStream;
+
+public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
+{
+    private int expectedValues = 0;
+
+    private String getRecordIdentifier(String[] values) {
+        return values[0];
+    }
+
+    private Nem12HeaderRecordDto read100Header(String[] values) {
+        return new Nem12HeaderRecordDto(getRecordIdentifier(values));
+    }
+
+    private Nem12NMIDetailRecordDto read200Record(String[] values) {
+        Nem12NMIDetailRecordDto result = new Nem12NMIDetailRecordDto();
+        result.setRecordIndicator(getRecordIdentifier(values));
+        result.setNmi(values[1]);
+        result.setIntervalLength(Integer.parseInt(values[8]));
+        expectedValues = Nem12Constants.NEM12_INTERVAL_COUNT_DIVIDEND / result.getIntervalLength();
+        return result;
+    }
+
+    private Nem12IntervalDataRecordDto read300Record(String[] values) {
+        if(values.length != expectedValues + 7) {
+            throw new IllegalArgumentException(
+                    String.format("Unexpected amount of interval values in a 300 record (expected %d, got %d)",
+                            expectedValues, values.length - 7));
+        }
+
+        Nem12IntervalDataRecordDto result = new Nem12IntervalDataRecordDto();
+        result.setRecordIndicator(getRecordIdentifier(values));
+        result.setIntervalDate(DateUtil.stringToLocalDate(values[1], Nem12Constants.DT_REVERSE));
+        result.setIntervalValues(IntStream.range(0, expectedValues)
+                .mapToObj(i -> new BigDecimal(values[i + 2])).toList());
+
+        result.setQualityMethod(values[expectedValues + 2]);
+        result.setReasonCode(Integer.parseInt(values[expectedValues + 2 + 1]));
+        result.setReasonDescription(values[expectedValues + 2 + 2]);
+        result.setUpdateDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 3],
+                Nem12Constants.DT_HMS_REVERSE));
+        result.setMsatsLoadDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 4],
+                Nem12Constants.DT_HMS_REVERSE));
+        return result;
+    }
+
+    private Nem12IntervalEventRecordDto read400Record(String[] values) {
+        return new Nem12IntervalEventRecordDto(getRecordIdentifier(values));
+    }
+
+    private Nem12B2BDetailsRecordDto read500Record(String[] values) {
+        return new Nem12B2BDetailsRecordDto(getRecordIdentifier(values));
+    }
+
+    private Nem12EndRecordDto read900Record(String[] values) {
+        return new Nem12EndRecordDto(getRecordIdentifier(values));
+    }
+
+    @Override
+    public Nem12RecordDto mapFieldSet(FieldSet fieldSet) throws BindException
+    {
+        String[] values = fieldSet.getValues();
+
+        return switch (values[0]) {
+            case Nem12Constants.NEM12_HEADER_IND -> read100Header(values);
+            case Nem12Constants.NEM12_NMI_DETAIL_IND -> read200Record(values);
+            case Nem12Constants.NEM12_INTERVAL_DATA_IND -> read300Record(values);
+            case Nem12Constants.NEM12_INTERVAL_EVENT_IND -> read400Record(values);
+            case Nem12Constants.NEM12_B2B_DETAILS_IND -> read500Record(values);
+            case Nem12Constants.NEM12_END_IND -> read900Record(values);
+            default -> throw new IllegalArgumentException(String.format("unable to parse record identifier %s", values[0]));
+        };
+    }
+}

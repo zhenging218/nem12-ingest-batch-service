@@ -1,7 +1,7 @@
 package com.yiuzg.flo.nem12.ingest.utilities;
 
 import com.yiuzg.flo.nem12.ingest.dto.MeterReadingDto;
-import com.yiuzg.flo.nem12.ingest.entity.MeterReadingEntity;
+import com.yiuzg.flo.nem12.ingest.entity.impl.MeterReadingEntity;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

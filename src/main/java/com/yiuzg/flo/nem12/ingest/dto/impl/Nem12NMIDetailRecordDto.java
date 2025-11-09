@@ -11,4 +11,6 @@ import lombok.*;
 public class Nem12NMIDetailRecordDto implements Nem12RecordDto
 {
     private String recordIndicator;
+    private String nmi;
+    private int intervalLength;
 }

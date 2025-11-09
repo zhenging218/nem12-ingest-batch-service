@@ -30,13 +30,13 @@ public class IngestStepConfiguration
 {
     @JobScope
     @Bean("ingestStep")
-    public Step ingestStep(String stepName,
+    public Step ingestStep(@Value("${flo.nem12.ingest.step.name}") String stepName,
        JobRepository jobRepository,
        PlatformTransactionManager platformTransactionManager,
        @Qualifier("nem12ItemReader") ItemReader<Nem12RecordDto> itemReader,
        @Qualifier("ingestItemProcessor") ItemProcessor<Nem12RecordDto, MeterReadingEntity> itemProcessor,
        @Qualifier("meterReadingEntityWriter") ItemWriter<MeterReadingEntity> itemWriter,
-       @Value("") int chunkSize
+       @Value("${flo.nem12.ingest.chunk-size}") int chunkSize
     ) {
         return new StepBuilder(stepName, jobRepository)
                 .<Nem12RecordDto, MeterReadingEntity>chunk(chunkSize, platformTransactionManager)
@@ -49,7 +49,7 @@ public class IngestStepConfiguration
     @StepScope
     @Bean("nem12LineTokenizer")
     public LineTokenizer nem12LineTokenizer(
-            @Value("") String delimiter
+            @Value("${flo.nem12.ingest.line.delimiter}") String delimiter
     ) {
         return new DelimitedLineTokenizer(delimiter);
     }
@@ -65,7 +65,7 @@ public class IngestStepConfiguration
     @StepScope
     @Bean("nem12ItemReader")
     public ItemReader<Nem12RecordDto> nem12ItemReader(
-            @Value("#{jobParameters['inputFile']}") String filePath,
+            @Value("#{jobParameters['filePath']}") String filePath,
             @Qualifier("nem12LineMapper") LineMapper<Nem12RecordDto> lineMapper) {
 
         FlatFileItemReader<Nem12RecordDto> itemReader = new FlatFileItemReader<>();

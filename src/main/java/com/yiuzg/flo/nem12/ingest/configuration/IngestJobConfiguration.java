@@ -70,21 +70,4 @@ public class IngestJobConfiguration
                 .next(commitMeterReadingStep)
                 .end();
     }
-
-    @JobScope
-    @Bean("ingestInitStep")
-    public Step ingestInitStep(
-            @Value("${flo.nem12.ingest.init.step.name}") String stepName,
-            JobRepository jobRepository, PlatformTransactionManager platformTransactionManager,
-            @Qualifier("ingestInitTasklet") Tasklet tasklet) {
-        return new StepBuilder(stepName, jobRepository)
-                .tasklet(tasklet, platformTransactionManager)
-                .build();
-    }
-
-    @StepScope
-    @Bean("ingestInitTasklet")
-    public Tasklet ingestInitTasklet() {
-        return new InitialiseIngestTasklet();
-    }
 }

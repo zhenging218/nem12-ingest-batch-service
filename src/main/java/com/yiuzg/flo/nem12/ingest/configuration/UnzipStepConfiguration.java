@@ -1,7 +1,5 @@
 package com.yiuzg.flo.nem12.ingest.configuration;
 
-import com.yiuzg.flo.nem12.ingest.constants.BatchJobConstants;
-import com.yiuzg.flo.nem12.ingest.dto.FileDto;
 import com.yiuzg.flo.nem12.ingest.service.FileArchiveService;
 import com.yiuzg.flo.nem12.ingest.service.FileStagingService;
 import com.yiuzg.flo.nem12.ingest.tasklet.UnzipTasklet;
@@ -17,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class UnZipStepConfiguration
+public class UnzipStepConfiguration
 {
     @Bean("unzipStep")
     public Step unzipStep(@Value("${flo.nem12.ingest.unzip.step.name}") String stepName, JobRepository jobRepository,

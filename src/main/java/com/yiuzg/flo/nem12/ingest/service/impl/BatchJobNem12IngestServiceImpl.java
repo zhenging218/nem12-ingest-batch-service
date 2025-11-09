@@ -1,6 +1,7 @@
 package com.yiuzg.flo.nem12.ingest.service.impl;
 
-import com.yiuzg.flo.nem12.ingest.dto.FileIngestDto;
+import com.yiuzg.flo.nem12.ingest.constants.BatchJobConstants;
+import com.yiuzg.flo.nem12.ingest.dto.FileDto;
 import com.yiuzg.flo.nem12.ingest.service.Nem12IngestService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
@@ -28,14 +29,14 @@ public class BatchJobNem12IngestServiceImpl implements Nem12IngestService
     }
 
     @Override
-    public Mono<String> ingest(FileIngestDto fileIngest)
+    public Mono<String> ingest(FileDto fileIngest)
     {
         return Mono.fromCallable(() -> {
             try
             {
                 var execution = jobLauncher.run(ingestJob, new JobParametersBuilder()
-                        .addString("filePath", fileIngest.getObjectKey())
-                        .addLong("timestamp", Instant.now().toEpochMilli())
+                        .addJobParameter(BatchJobConstants.JOB_PARAM_INGEST_FILE_PATH_KEY, fileIngest, FileDto.class)
+                        .addLong(BatchJobConstants.JOB_PARAM_TIMESTAMP_KEY, Instant.now().toEpochMilli())
                         .toJobParameters()
                 );
 

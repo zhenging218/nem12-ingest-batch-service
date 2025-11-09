@@ -1,7 +1,6 @@
 package com.yiuzg.flo.nem12.ingest.service.impl;
 
-import com.yiuzg.flo.nem12.ingest.dto.FileIngestDto;
-import com.yiuzg.flo.nem12.ingest.dto.impl.FileSystemFileIngestDto;
+import com.yiuzg.flo.nem12.ingest.dto.FileDto;
 import com.yiuzg.flo.nem12.ingest.service.FileArchiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,12 +10,14 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-@ConditionalOnProperty(prefix = "flo.nem12.ingest.archive.target", havingValue = "file-system-local")
+@ConditionalOnProperty(name = "flo.nem12.ingest.archive.target", havingValue = "file-system-local")
 public class LocalFileSystemFileArchiveServiceImpl implements FileArchiveService
 {
     private final String archiveLocation;
@@ -29,13 +30,19 @@ public class LocalFileSystemFileArchiveServiceImpl implements FileArchiveService
     }
 
     @Override
-    public Mono<FileIngestDto> archive(FilePart file) throws IOException
+    public Mono<FileDto> archive(FilePart file) throws IOException
     {
-        Path archive = Files.createFile(Path.of(archiveLocation, UUID.randomUUID().toString()));
+        Path archive = Files.createFile(
+                Path.of(archiveLocation, UUID.randomUUID().toString()));
         return file.transferTo(archive)
-                .thenReturn(new FileSystemFileIngestDto(
-                        file.filename(),
+                .thenReturn(new FileDto(file.filename(),
                         archive.toAbsolutePath().toString()
                 ));
+    }
+
+    @Override
+    public InputStream retrieve(FileDto file) throws IOException
+    {
+        return Files.newInputStream(Paths.get(file.getObjectKey()));
     }
 }

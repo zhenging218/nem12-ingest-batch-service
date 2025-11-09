@@ -1,7 +1,9 @@
-package com.yiuzg.flo.nem12.ingest.dto.impl;
+package com.yiuzg.flo.nem12.ingest.dto;
 
-import com.yiuzg.flo.nem12.ingest.dto.FileIngestDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,13 +12,13 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class FileSystemFileIngestDto implements FileIngestDto
+public class FileDto
 {
     private String filename;
     private String objectKey;
     private Map<String, String> attributes;
 
-    public FileSystemFileIngestDto(String filename, String objectKey) {
+    public FileDto(String filename, String objectKey) {
         this.filename = filename;
         this.objectKey = objectKey;
         this.attributes = new HashMap<>();

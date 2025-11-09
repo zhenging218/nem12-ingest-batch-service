@@ -18,10 +18,10 @@ public abstract class StagingEntity
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", length = 20, nullable = false)
     private String type;
 
-    @Column(name = "state", nullable = false)
+    @Column(name = "state", length = 1, nullable = false)
     private String state;
 
     @Column(name = "retries", nullable = false)

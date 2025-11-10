@@ -4,6 +4,7 @@ import com.yiuzg.flo.nem12.ingest.constants.Nem12Constants;
 import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
 import com.yiuzg.flo.nem12.ingest.dto.impl.*;
 import com.yiuzg.flo.nem12.ingest.utilities.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
@@ -46,12 +47,22 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
                 .mapToObj(i -> new BigDecimal(values[i + 2])).toList());
 
         result.setQualityMethod(values[expectedValues + 2]);
-        result.setReasonCode(Integer.parseInt(values[expectedValues + 2 + 1]));
+        if(StringUtils.isNotBlank(values[expectedValues + 2 + 1])) {
+            result.setReasonCode(Integer.parseInt(values[expectedValues + 2 + 1]));
+        }
         result.setReasonDescription(values[expectedValues + 2 + 2]);
-        result.setUpdateDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 3],
-                Nem12Constants.DT_HMS_REVERSE));
-        result.setMsatsLoadDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 4],
-                Nem12Constants.DT_HMS_REVERSE));
+
+        if(StringUtils.isNotBlank(values[expectedValues + 2 + 3])) {
+            result.setUpdateDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 3],
+                    Nem12Constants.DT_HMS_REVERSE));
+        }
+
+        if(StringUtils.isNotBlank(values[expectedValues + 2 + 4]))
+        {
+            result.setMsatsLoadDateTime(DateUtil.stringToLocalDateTime(values[expectedValues + 2 + 4],
+                    Nem12Constants.DT_HMS_REVERSE));
+        }
+
         return result;
     }
 

@@ -12,9 +12,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -35,22 +33,19 @@ public class BatchJobNem12IngestServiceImpl implements Nem12IngestService
     }
 
     @Override
-    public Mono<String> ingest(FileDto fileIngest)
+    public String ingest(FileDto fileIngest)
     {
-        return Mono.fromCallable(() -> {
-            try
-            {
-                var execution = jobLauncher.run(ingestJob, new JobParametersBuilder()
-                        .addString(BatchJobConstants.JOB_PARAM_INGEST_FILE_PATH_KEY,
-                                BatchJobUtil.createJobParameterString(objectMapper, fileIngest))
-                        .addLocalDateTime(BatchJobConstants.JOB_PARAM_TIMESTAMP_KEY, LocalDateTime.now())
-                        .toJobParameters());
+        try
+        {
+            var execution = jobLauncher.run(ingestJob, new JobParametersBuilder()
+                    .addString(BatchJobConstants.JOB_PARAM_INGEST_FILE_KEY, fileIngest.getObjectKey())
+                    .addLocalDateTime(BatchJobConstants.JOB_PARAM_TIMESTAMP_KEY, LocalDateTime.now())
+                    .toJobParameters());
 
-                return Long.toString(execution.getJobId());
-            }
-            catch(JobExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
+            return Long.toString(execution.getJobId());
+        }
+        catch(JobExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

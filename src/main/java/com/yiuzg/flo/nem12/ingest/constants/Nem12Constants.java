@@ -20,5 +20,5 @@ public class Nem12Constants
     // DateTime(12)
     public static final String DT_HM_REVERSE = "yyyyMMddHHmm";
     // DateTime(14)
-    public static final String DT_HMS_REVERSE = "yyyyMMdHHmmss";
+    public static final String DT_HMS_REVERSE = "yyyyMMddHHmmss";
 }

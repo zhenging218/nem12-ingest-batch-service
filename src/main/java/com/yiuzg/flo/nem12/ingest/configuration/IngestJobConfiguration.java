@@ -49,7 +49,7 @@ public class IngestJobConfiguration
         builder.from(decider)
                 .on(BatchJobConstants.FLOW_EXECUTION_STATUS_CONTINUE.getName())
                 .to(ingestFlow)
-                .next(decider);
+                .on(BatchJobConstants.WILD_CARD_FLOW_IND).to(decider);
 
         return builder.end().build();
     }

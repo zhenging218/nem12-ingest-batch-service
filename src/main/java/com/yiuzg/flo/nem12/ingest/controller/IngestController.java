@@ -1,5 +1,6 @@
 package com.yiuzg.flo.nem12.ingest.controller;
 
+import com.yiuzg.flo.nem12.ingest.dto.IngestResponseDto;
 import com.yiuzg.flo.nem12.ingest.service.FileArchiveService;
 import com.yiuzg.flo.nem12.ingest.service.Nem12IngestService;
 import org.apache.commons.lang3.Strings;
@@ -29,7 +30,7 @@ public class IngestController
     }
 
     @PostMapping(path = {"/file","/file/"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Mono<String>> postIngestFile(@RequestPart("file") FilePart file) throws IOException
+    ResponseEntity<Mono<IngestResponseDto>> postIngestFile(@RequestPart("file") FilePart file) throws IOException
     {
         return ResponseEntity.accepted().body(fileArchiveService.archive(file)
                 .map(nem12IngestService::ingest));

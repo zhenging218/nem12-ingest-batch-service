@@ -10,6 +10,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class Nem12RecordItemWriter implements ItemWriter<Nem12RecordDto>
 {
@@ -20,8 +22,16 @@ public class Nem12RecordItemWriter implements ItemWriter<Nem12RecordDto>
     private void commitMeterReading(Nem12IntervalDataRecordDto nem12300Record) {
         BigDecimal consumption = nem12300Record.getIntervalValues().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        meterReadingRepository.save(
-                new MeterReadingEntity(currentNmi, nem12300Record.getIntervalDate().atStartOfDay(), consumption));
+        LocalDateTime timestamp = nem12300Record.getIntervalDate().atStartOfDay();
+
+        meterReadingRepository.findByNmiAndTimestamp(currentNmi, timestamp)
+                .or(() -> Optional.of(new MeterReadingEntity()))
+                        .map(entity -> {
+                            entity.setNmi(currentNmi);
+                            entity.setTimestamp(timestamp);
+                            entity.setConsumption(consumption);
+                            return entity;
+                        }).ifPresent(meterReadingRepository::save);
     }
 
     public Nem12RecordItemWriter(MeterReadingRepository meterReadingRepository)

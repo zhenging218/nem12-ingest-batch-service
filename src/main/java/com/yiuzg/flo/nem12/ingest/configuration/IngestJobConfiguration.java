@@ -16,11 +16,13 @@ public class IngestJobConfiguration
     public Job ingestJob(
             @Value("${flo.nem12.ingest.job.name}") String jobName, JobRepository jobRepository,
             @Qualifier("ingestInitStep") Step ingestInitStep,
-            @Qualifier("ingestStep") Step ingestStep
+            @Qualifier("ingestStep") Step ingestStep,
+            @Qualifier("housekeepStep") Step housekeepStep
     ) {
         return new JobBuilder(jobName, jobRepository)
                 .start(ingestInitStep)
                 .next(ingestStep)
+                .next(housekeepStep)
                 .build();
     }
 }

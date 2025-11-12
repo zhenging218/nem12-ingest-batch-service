@@ -1,8 +1,6 @@
 package com.yiuzg.flo.nem12.ingest.tasklet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yiuzg.flo.nem12.ingest.constants.BatchJobConstants;
-import com.yiuzg.flo.nem12.ingest.dto.FileDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;

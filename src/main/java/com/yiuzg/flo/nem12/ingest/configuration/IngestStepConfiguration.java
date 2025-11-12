@@ -1,19 +1,15 @@
 package com.yiuzg.flo.nem12.ingest.configuration;
 
 import com.yiuzg.flo.nem12.ingest.constants.BatchJobConstants;
-import com.yiuzg.flo.nem12.ingest.constants.Nem12Constants;
-import com.yiuzg.flo.nem12.ingest.dto.FileDto;
 import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
 import com.yiuzg.flo.nem12.ingest.mapper.Nem12FieldSetMapper;
 import com.yiuzg.flo.nem12.ingest.repository.MeterReadingRepository;
-import com.yiuzg.flo.nem12.ingest.service.FileArchiveService;
 import com.yiuzg.flo.nem12.ingest.writer.Nem12RecordItemWriter;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;

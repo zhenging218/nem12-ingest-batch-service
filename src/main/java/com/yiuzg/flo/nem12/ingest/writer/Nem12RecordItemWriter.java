@@ -1,6 +1,7 @@
 package com.yiuzg.flo.nem12.ingest.writer;
 
 import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
+import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12EndRecordDto;
 import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12IntervalDataRecordDto;
 import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12NMIDetailRecordDto;
 import com.yiuzg.flo.nem12.ingest.entity.impl.MeterReadingEntity;

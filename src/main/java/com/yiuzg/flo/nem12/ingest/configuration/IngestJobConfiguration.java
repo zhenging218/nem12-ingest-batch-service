@@ -1,5 +1,6 @@
 package com.yiuzg.flo.nem12.ingest.configuration;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -20,7 +21,9 @@ public class IngestJobConfiguration
     ) {
         return new JobBuilder(jobName, jobRepository)
                 .start(ingestInitStep)
-                .next(ingestStep)
+                .on(ExitStatus.NOOP.getExitCode()).end()
+                .from(ingestInitStep).on(ExitStatus.COMPLETED.getExitCode())
+                .to(ingestStep).end()
                 .build();
     }
 }

@@ -14,7 +14,8 @@ import java.util.stream.IntStream;
 
 public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
 {
-    private int expectedValues = 0;
+    private int expectedValues;
+    private boolean endRecordReached;
 
     private String getRecordIdentifier(String[] values) {
         return values[0];
@@ -75,7 +76,14 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
     }
 
     private Nem12EndRecordDto read900Record(String[] values) {
+        endRecordReached = true;
         return new Nem12EndRecordDto(getRecordIdentifier(values));
+    }
+
+    public Nem12FieldSetMapper()
+    {
+        this.expectedValues = 0;
+        this.endRecordReached = false;
     }
 
     @Override
@@ -83,14 +91,21 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
     {
         String[] values = fieldSet.getValues();
 
-        return switch (values[0]) {
-            case Nem12Constants.NEM12_HEADER_IND -> read100Header(values);
-            case Nem12Constants.NEM12_NMI_DETAIL_IND -> read200Record(values);
-            case Nem12Constants.NEM12_INTERVAL_DATA_IND -> read300Record(values);
-            case Nem12Constants.NEM12_INTERVAL_EVENT_IND -> read400Record(values);
-            case Nem12Constants.NEM12_B2B_DETAILS_IND -> read500Record(values);
-            case Nem12Constants.NEM12_END_IND -> read900Record(values);
-            default -> throw new IllegalArgumentException(String.format("unable to parse record identifier %s", values[0]));
-        };
+        if(!endRecordReached)
+        {
+            return switch (values[0])
+            {
+                case Nem12Constants.NEM12_HEADER_IND -> read100Header(values);
+                case Nem12Constants.NEM12_NMI_DETAIL_IND -> read200Record(values);
+                case Nem12Constants.NEM12_INTERVAL_DATA_IND -> read300Record(values);
+                case Nem12Constants.NEM12_INTERVAL_EVENT_IND -> read400Record(values);
+                case Nem12Constants.NEM12_B2B_DETAILS_IND -> read500Record(values);
+                case Nem12Constants.NEM12_END_IND -> read900Record(values);
+                default ->
+                        throw new IllegalArgumentException(String.format("unable to parse record identifier %s", values[0]));
+            };
+        } else {
+            throw new IllegalStateException("Parsed end indicator, but expectedly able to read more records after it");
+        }
     }
 }

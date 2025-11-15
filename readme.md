@@ -12,7 +12,7 @@ The application requires Java 21 to run. It uses Spring Boot 3 and is built via 
 
 ## Building the application
 
-To build the application, run the maven goals using ```mvn clean install```. To build without running the unit tests, specify ```-DskipTests``` when running the maven goals.
+To build the application, run the maven goals using ```mvn clean package```. To build without running the unit tests, specify ```-DskipTests``` when running the maven goals.
 
 ## Running the application
 

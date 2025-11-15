@@ -1,50 +1,27 @@
-@startuml
-boundary ingest as i
-participant "File Ingest Integration" as t
-participant IngestInitJob as iij
-database "Batch Job Context" as jc
-participant IngestJob as ij
-database meter_readings as db
-boundary archive as s
+# nem12-ingest-batch-service
 
-i -> t : polled file
-activate t
-t -> iij : polled file path
-activate iij
-iij -> jc : save path to context
-deactivate iij
+This repository is a simple Spring Batch + Spring Integration application to ingest .csv files of NEM12 specification.
 
-== ingest file to insert data ==
+## Dependencies
 
-ij -> jc : get path from context
-activate ij
-activate jc
-jc --> ij : file path
-deactivate jc
-loop every line in file
-ij -> ij : read record
-activate ij
-deactivate ij
-alt record is type 200
-ij -> ij : set current nmi
-else record is type 300
-ij -> db : fetch existing record
-activate db
-db --> ij : fetch result
-deactivate db
-alt no record exist
-ij -> db : save new record
-end
-activate db
-deactivate db
-else record is type 900
-ij -> ij : indicate end file
-end
-end
-ij --> t
-deactivate ij
-== archive source file ==
-t -> s : move file into archive
-deactivate t
+The application requires Java 21 to run. It uses Spring Boot 3 and is built via Maven.
 
-@enduml
+## Building the application
+
+To build the application, run the maven goals using ```mvn clean install```. To build without running the unit tests, specify ```-DskipTests``` when running the maven goals.
+
+## Running the application
+
+To run the built .jar file, navigate to the build directory ```target``` and run the .jar file with the ```java -jar``` command.
+
+The staging and archive directory must be specified. You can do this by specifying it along with the command to run the jar:
+
+```flo.nem12.ingest.staging.file-system-local.location=<your staging directory location>```
+
+```flo.nem12.ingest.archive.file-system-local.location=./<your archive directory location>```
+
+if the directories are not specified, directories will be generated at ```./staging``` and ```./archive``` respectively. To turn off automatic directory genration, you can set the following properties to ```false``` by specifying it in the command to run the jar:
+
+```flo.nem12.ingest.staging.file-system-local.location.auto-create=<true/false>```
+
+```flo.nem12.ingest.archive.file-system-local.location.auto-create=<true/false>```

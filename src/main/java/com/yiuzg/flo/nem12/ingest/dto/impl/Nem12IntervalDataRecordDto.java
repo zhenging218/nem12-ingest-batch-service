@@ -16,6 +16,7 @@ import java.util.List;
 public class Nem12IntervalDataRecordDto implements Nem12RecordDto
 {
     private String recordIndicator;
+    private String nmi;
     private LocalDate intervalDate;
     private List<BigDecimal> intervalValues;
     private String qualityMethod;

@@ -110,7 +110,7 @@ class IngestJobTest
         Assertions.assertTrue(result.getStepExecutions().stream().map(StepExecution::getStepName)
                 .toList().containsAll(List.of(ingestInitStepName, ingestStepName)));
 
-        Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), result.getExitStatus().getExitCode());
+        Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), result.getExitStatus().getExitCode());
 
         Mockito.verify(meterReadingRepository, Mockito.times(4)).save(any());
     }

@@ -1,9 +1,12 @@
+# Sequence Diagram
+
+As GitHub does not support loading PlantUML generated UML diagrams, the PlantUML script is included separately. The image of the diagram generated has been included as a PNG file in the *images* folder and linked to in the main [README](./readme.md).
+
 @startuml
 boundary staging as i
 participant "File Ingest Integration" as t
-participant IngestInitJob as iij
 database "Batch Job Context" as jc
-participant IngestJob as ij
+participant "Ingest Batch Job" as ij
 database meter_readings as db
 boundary archive as s
 
@@ -11,10 +14,10 @@ boundary archive as s
 
 i -> t : polled file
 activate t
-t -> iij : polled file path
-activate iij
-iij -> jc : save path to context
-deactivate iij
+t -> ij : polled file path
+activate ij
+ij -> jc : save path to context
+deactivate ij
 
 == ingest file to insert data ==
 
@@ -43,7 +46,7 @@ else record is type 900
 ij -> ij : indicate end file
 end
 end
-ij --> t
+ij -> jc : batch job result
 deactivate ij
 == archive source file ==
 t -> s : move file into archive

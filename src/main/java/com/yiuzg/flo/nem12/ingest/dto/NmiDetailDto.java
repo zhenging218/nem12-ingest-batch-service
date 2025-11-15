@@ -3,8 +3,6 @@ package com.yiuzg.flo.nem12.ingest.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,12 +10,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class MeterReadingDto implements Serializable
+public class NmiDetailDto
 {
     private String nmi;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
-    private LocalDateTime timestamp;
+    private Integer count;
 
-    private BigDecimal consumption;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
+    private LocalDateTime startTimestamp;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
+    private LocalDateTime endTimestamp;
 }

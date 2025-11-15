@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 
 public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
 {
+    private String currentNmi;
     private int expectedValues;
     private boolean endRecordReached;
 
@@ -29,12 +30,17 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
         Nem12NMIDetailRecordDto result = new Nem12NMIDetailRecordDto();
         result.setRecordIndicator(getRecordIdentifier(values));
         result.setNmi(values[1]);
+        currentNmi = result.getNmi();
         result.setIntervalLength(Integer.parseInt(values[8]));
         expectedValues = Nem12Constants.NEM12_INTERVAL_COUNT_DIVIDEND / result.getIntervalLength();
         return result;
     }
 
     private Nem12IntervalDataRecordDto read300Record(String[] values) {
+        if(StringUtils.isBlank(currentNmi)) {
+            throw new IllegalArgumentException("Unexpected 300 record before a 200 record was read");
+        }
+
         if(values.length != expectedValues + 7) {
             throw new IllegalArgumentException(
                     String.format("Unexpected amount of interval values in a 300 record (expected %d, got %d)",
@@ -42,6 +48,7 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
         }
 
         Nem12IntervalDataRecordDto result = new Nem12IntervalDataRecordDto();
+        result.setNmi(currentNmi);
         result.setRecordIndicator(getRecordIdentifier(values));
         result.setIntervalDate(DateUtil.stringToLocalDate(values[1], Nem12Constants.DT_REVERSE));
         result.setIntervalValues(IntStream.range(0, expectedValues)
@@ -68,10 +75,16 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
     }
 
     private Nem12IntervalEventRecordDto read400Record(String[] values) {
+        if(StringUtils.isBlank(currentNmi)) {
+            throw new IllegalArgumentException("Unexpected 400 record before a 200 record was read");
+        }
         return new Nem12IntervalEventRecordDto(getRecordIdentifier(values));
     }
 
     private Nem12B2BDetailsRecordDto read500Record(String[] values) {
+        if(StringUtils.isBlank(currentNmi)) {
+            throw new IllegalArgumentException("Unexpected 500 record before a 200 record was read");
+        }
         return new Nem12B2BDetailsRecordDto(getRecordIdentifier(values));
     }
 
@@ -83,6 +96,7 @@ public class Nem12FieldSetMapper implements FieldSetMapper<Nem12RecordDto>
     public Nem12FieldSetMapper()
     {
         this.expectedValues = 0;
+        this.currentNmi = null;
         this.endRecordReached = false;
     }
 

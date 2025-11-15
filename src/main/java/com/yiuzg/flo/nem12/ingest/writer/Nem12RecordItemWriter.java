@@ -1,10 +1,10 @@
 package com.yiuzg.flo.nem12.ingest.writer;
 
 import com.yiuzg.flo.nem12.ingest.dto.Nem12RecordDto;
-import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12EndRecordDto;
 import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12IntervalDataRecordDto;
 import com.yiuzg.flo.nem12.ingest.dto.impl.Nem12NMIDetailRecordDto;
 import com.yiuzg.flo.nem12.ingest.entity.impl.MeterReadingEntity;
+import com.yiuzg.flo.nem12.ingest.exception.DuplicateDataException;
 import com.yiuzg.flo.nem12.ingest.repository.MeterReadingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -19,31 +19,29 @@ public class Nem12RecordItemWriter implements ItemWriter<Nem12RecordDto>
 {
     private final MeterReadingRepository meterReadingRepository;
 
-    private String currentNmi;
-
-    private Optional<MeterReadingEntity> createMeterReadingForCommit(Nem12IntervalDataRecordDto nem12300Record) {
+    private MeterReadingEntity createMeterReadingForCommit(Nem12IntervalDataRecordDto nem12300Record) throws DuplicateDataException
+    {
         BigDecimal consumption = nem12300Record.getIntervalValues().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 
         LocalDateTime timestamp = nem12300Record.getIntervalDate().atStartOfDay();
 
-        Optional<MeterReadingEntity> result = meterReadingRepository.findByNmiAndTimestamp(currentNmi, timestamp);
+        Optional<MeterReadingEntity> result = meterReadingRepository.findByNmiAndTimestamp(nem12300Record.getNmi(), timestamp);
 
         if(result.isEmpty()) {
             MeterReadingEntity entity = new MeterReadingEntity();
-            entity.setNmi(currentNmi);
+            entity.setNmi(nem12300Record.getNmi());
             entity.setTimestamp(timestamp);
             entity.setConsumption(consumption);
-            return Optional.of(entity);
+            return entity;
         }
 
-        log.warn("Duplicate record found (will skip): {}", nem12300Record);
-        return Optional.empty();
+        log.error("Duplicate record found: {}", nem12300Record);
+        throw new DuplicateDataException(nem12300Record);
     }
 
     public Nem12RecordItemWriter(MeterReadingRepository meterReadingRepository)
     {
         this.meterReadingRepository = meterReadingRepository;
-        this.currentNmi = null;
     }
 
     @Override
@@ -53,9 +51,10 @@ public class Nem12RecordItemWriter implements ItemWriter<Nem12RecordDto>
             for (Nem12RecordDto item : chunk.getItems())
             {
                 switch (item) {
-                    case Nem12NMIDetailRecordDto nem12200Record -> currentNmi = nem12200Record.getNmi();
-                    case Nem12IntervalDataRecordDto nem12300Record -> createMeterReadingForCommit(nem12300Record)
-                            .ifPresent(meterReadingRepository::save);
+                    // intentionally left as switch case, so that implementing the other record types no need
+                    // to rewrite if statement
+                    case Nem12IntervalDataRecordDto nem12300Record ->
+                            meterReadingRepository.save(createMeterReadingForCommit(nem12300Record));
                     default -> {}
                 }
             }

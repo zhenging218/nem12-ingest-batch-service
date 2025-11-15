@@ -52,3 +52,7 @@ This is just for ease of running the app. The DDL provided seems to be for Postg
 
 ### 8. Non-reactive endpoints
 The batch job implementation is simple and sequential, so no WebFlux is used to over-complicate the endpoints.
+
+### 9. No additional staging table
+
+This is intentional to keep the submission simple. The only additional tables that are required are the Spring Batch tables, which are configured to be generated automatically. If the application is configured to point to your database instead of the H2 in memory, please provide the permissions to the user the application will use to connect so that the Spring Batch tables can be created.
